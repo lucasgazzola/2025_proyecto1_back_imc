@@ -104,7 +104,8 @@ Tras unos minutos, Vercel dará una **URL pública** para el frontend (ej:
 
 ## 🔗 6. URLs finales
 
-- **Frontend (Vercel)**: [https://calculadora-imc-front.vercel.app](#)
-- **Backend (Azure)**: [https://calculadora-imc-back.azurewebsites.net](#)
+- **Frontend**: [https://github.com/lucasgazzola/2025_proyecto1_front_imc](https://github.com/lucasgazzola/2025_proyecto1_front_imc)
+- **Backend**: [https://github.com/lucasgazzola/2025_proyecto1_back_imc](https://github.com/lucasgazzola/2025_proyecto1_back_imc)
+- **LiveUIRL**: [https://2025-proyecto1-front-imc-three.vercel.app/](https://2025-proyecto1-front-imc-three.vercel.app/)
 
 ---

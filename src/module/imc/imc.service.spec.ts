@@ -1,7 +1,6 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { ImcService } from "./imc.service";
-import { CalcularImcDto } from "./dto/calcular-imc-dto";
-
+import { Test, TestingModule } from '@nestjs/testing';
+import { ImcService } from './imc.service';
+import { CalcularImcDto } from './dto/calcular-imc-dto';
 
 describe('ImcService', () => {
   let service: ImcService;
@@ -44,5 +43,19 @@ describe('ImcService', () => {
     const result = service.calcularImc(dto);
     expect(result.imc).toBeCloseTo(32.65, 2);
     expect(result.categoria).toBe('Obeso');
+  });
+
+  it('should throw error for very high weight (> 500 kg)', () => {
+    const dto: CalcularImcDto = { altura: 1.75, peso: 510 };
+    expect(() => service.calcularImc(dto)).toThrow(
+      'El peso no puede ser mayor a 500 kg',
+    );
+  });
+
+  it('should throw error for very tall height (> 3 meters)', () => {
+    const dto: CalcularImcDto = { altura: 3.1, peso: 100 };
+    expect(() => service.calcularImc(dto)).toThrow(
+      'La altura no puede ser mayor a 3 metros',
+    );
   });
 });

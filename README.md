@@ -1,99 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 📌 Calculadora IMC – Deploy (Entrega 1)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este documento explica los pasos realizados para desplegar la aplicación **Calculadora IMC**, tanto en el **backend (NestJS en Azure)** como en el **frontend (React-Vite en Vercel)**.
+La idea es que cualquier persona pueda reproducir el proceso de manera sencilla.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 1. Preparación de repositorios
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+1. Hacer **fork** de los repositorios oficiales:
+   - [Frontend](https://github.com/Programacion-Avanzada-UTN-FRVM/2025_proyecto1_front_imc)
+   - [Backend](https://github.com/Programacion-Avanzada-UTN-FRVM/2025_proyecto1_back_imc)
 
-## Project setup
+2. Clonar los forks en tu máquina local y realizar los ajustes necesarios:
 
-```bash
-$ yarn install
-```
+   ```sh
+   # Clonar el backend
+   git clone https://github.com/<nombreusuario>/2025_proyecto1_back_imc
 
-## Compile and run the project
+   # Clonar el frontend
+   git clone https://github.com/<nombreusuario>/2025_proyecto1_front_imc
+   ```
 
-```bash
-# development
-$ yarn run start
+---
 
-# watch mode
-$ yarn run start:dev
+## 🔧 2. Configuración del Backend (NestJS en Azure)
 
-# production mode
-$ yarn run start:prod
-```
+### 2.1 Ajustes en el código
 
-## Run tests
+Antes de desplegar en Azure, se hicieron dos cambios importantes:
+En `main.ts`:
 
-```bash
-# unit tests
-$ yarn run test
+- **Puerto dinámico**:
 
-# e2e tests
-$ yarn run test:e2e
+  ```ts
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  ```
 
-# test coverage
-$ yarn run test:cov
-```
+  Azure necesita manejar el puerto automáticamente mediante `process.env.PORT`.
 
-## Deployment
+- **Habilitar CORS**:
+  Se agregó:
+  ```ts
+  app.enableCors();
+  ```
+  Esto permite que el frontend pueda conectarse al backend sin problemas.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 2.2 Deploy en Azure App Services
 
-```bash
-$ yarn install -g mau
-$ mau deploy
-```
+1. Ingresar al [Portal de Azure](https://portal.azure.com).
+2. Ir a **App Services → Crear → Aplicación Web**.
+3. Configurar los siguientes parámetros:
+   - **Nombre de la aplicación** (ej: `imc-backend`).
+   - **Región** (ej: _South Central US_ o la más cercana).
+   - **Plan de hosting**: capa gratuita o de estudiantes.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. Activar **Integración Continua (CI/CD)**:
+   - Seleccionar GitHub como origen.
+   - Elegir el repositorio del backend (fork) y la rama `master`.
+   - Con esto, cada `git push` a `master` actualizará automáticamente la app en Azure.
 
-## Resources
+5. Una vez finalizado, Azure generará una **URL pública** (ej:
+   `imc-backend-gtc4h9dhddckh2fh.brazilsouth-01.azurewebsites.net`).
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 🌐 3. Configuración del Frontend (React-Vite en Vercel)
 
-## Support
+### 3.1 Deploy en Vercel
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1. Ir a [Vercel](https://vercel.com) y crear cuenta (puede ser con GitHub).
+2. Seleccionar **Nuevo Proyecto** → elegir el repositorio del frontend.
+3. Configurar variables de entorno (`.env`) con la **URL del backend en Azure**.
+   Ejemplo:
+   ```env
+   VITE_API_URL=https://calculadora-imc-back.azurewebsites.net
+   ```
+4. Configurar `outDir` si es necesario (por defecto, Vite usa `dist`).
+5. Hacer clic en **Deploy**.
 
-## Stay in touch
+Tras unos minutos, Vercel dará una **URL pública** para el frontend (ej:
+`https://2025-proyecto1-front-imc-three.vercel.app/`).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## ✅ 4. Verificación
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- Acceder al **frontend en Vercel**.
+- Ingresar peso y altura → la app debe conectarse con el **backend en Azure** y mostrar el resultado del IMC.
+
+---
+
+## 📊 5. Lecciones aprendidas
+
+- Azure requiere que el puerto sea dinámico (`process.env.PORT`).
+- Es fundamental habilitar **CORS** en el backend para permitir comunicación con el frontend.
+- Vercel facilita el deploy del frontend con mínima configuración.
+- La integración continua en Azure permite que cada cambio en el repositorio se despliegue automáticamente.
+
+---
+
+## 🔗 6. URLs finales
+
+- **Frontend (Vercel)**: [https://calculadora-imc-front.vercel.app](#)
+- **Backend (Azure)**: [https://calculadora-imc-back.azurewebsites.net](#)
+
+---

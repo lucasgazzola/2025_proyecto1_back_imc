@@ -1,6 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { CalcularImcDto } from "./dto/calcular-imc-dto";
-
+import { Injectable } from '@nestjs/common';
+import { CalcularImcDto } from './dto/calcular-imc-dto';
 
 @Injectable()
 export class ImcService {
@@ -8,6 +7,13 @@ export class ImcService {
     const { altura, peso } = data;
     const imc = peso / (altura * altura);
     const imcRedondeado = Math.round(imc * 100) / 100; // Dos decimales
+
+    if (data.peso > 500) {
+      throw new Error('El peso no puede ser mayor a 500 kg');
+    }
+    if (data.altura > 3) {
+      throw new Error('La altura no puede ser mayor a 3 metros');
+    }
 
     let categoria: string;
     if (imc < 18.5) {
@@ -23,4 +29,3 @@ export class ImcService {
     return { imc: imcRedondeado, categoria };
   }
 }
-

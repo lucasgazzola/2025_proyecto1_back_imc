@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -35,6 +40,20 @@ export class UserService {
     email: string,
     password: string,
   ): Promise<Omit<User, 'password'>> {
+    // TODO: Extraer saltRounds a una constante global o variable de entorno
+
+    if (!email || !password) {
+      throw new BadRequestException('Email and password are required');
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      throw new BadRequestException('Invalid email format');
+    }
+    if (password.length < 6) {
+      throw new BadRequestException(
+        'Password must be at least 6 characters long',
+      );
+    }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const user = this.userRepository.create({
@@ -42,14 +61,23 @@ export class UserService {
       password: hashedPassword,
     });
     await this.userRepository.save(user);
+    // Crear historial y asociar al usuario
     const historial = this.historialRepository.create({ calculos: [], user });
     await this.historialRepository.save(historial);
-    user.historial = historial;
-    await this.userRepository.save(user);
+    // Actualizar el usuario con el historial asociado
+    await this.userRepository.update(user.id, { historial });
+    // Recuperar el usuario actualizado con la relación
+    const userWithHistorial = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['historial', 'historial.calculos'],
+    });
+    if (!userWithHistorial || !userWithHistorial.historial) {
+      throw new ConflictException('Error al asociar historial al usuario');
+    }
     return {
-      id: user.id,
-      email: user.email,
-      historial: user.historial,
+      id: userWithHistorial.id,
+      email: userWithHistorial.email,
+      historial: userWithHistorial.historial,
     };
   }
 
@@ -91,7 +119,12 @@ export class UserService {
 
   async getHistory(userId: number): Promise<Calculo[]> {
     const user = await this.findById(userId);
-    if (!user || !user.historial) return [];
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    if (!user.historial) {
+      return [];
+    }
     return user.historial.calculos;
   }
 }

@@ -8,6 +8,13 @@ export class ImcService {
     const imc = peso / (altura * altura);
     const imcRedondeado = Math.round(imc * 100) / 100; // Dos decimales
 
+    // Agregadas vaidaciones
+    if (data.altura < 0) {
+      throw new Error('La altura debe ser un número positivo distinto de cero');
+    }
+    if (data.peso < 0) {
+      throw new Error('El peso debe ser un número positivo distinto de cero');
+    }
     if (data.peso > 500) {
       throw new Error('El peso no puede ser mayor a 500 kg');
     }

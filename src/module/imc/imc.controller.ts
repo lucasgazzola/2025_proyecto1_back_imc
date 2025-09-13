@@ -21,7 +21,7 @@ export class ImcController {
   @UseGuards(JwtAuthGuard)
   @Post('calcular')
   async calcular(@Body(ValidationPipe) data: CalcularImcDto, @Req() req) {
-    const result = this.imcService.calcularImc(data);
+    const result = await this.imcService.calcularImc(data);
 
     const email = req.user.email;
 

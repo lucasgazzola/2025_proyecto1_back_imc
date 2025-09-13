@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { Historial } from './historial.entity';
 import { Calculo } from './calculo.entity';
 
@@ -14,10 +18,12 @@ export class HistorialService {
   ) {}
 
   async getById(id: number): Promise<Historial | null> {
-    return this.historialRepository.findOne({
+    const historial = await this.historialRepository.findOne({
       where: { id },
       relations: ['calculos'],
     });
+    if (!historial) throw new NotFoundException('Historial not found');
+    return historial;
   }
 
   async getByUserEmail(email: string): Promise<Historial | null> {
@@ -32,7 +38,22 @@ export class HistorialService {
     entry: Partial<Calculo>,
   ): Promise<Calculo | null> {
     const historial = await this.getById(historialId);
-    if (!historial) throw new Error('Historial not found');
+    if (!historial) throw new NotFoundException('Historial not found');
+
+    // Validaciones explícitas para peso y altura
+    if (
+      entry.peso === null ||
+      entry.peso === undefined ||
+      typeof entry.peso !== 'number' ||
+      isNaN(entry.peso) ||
+      entry.altura === null ||
+      entry.altura === undefined ||
+      typeof entry.altura !== 'number' ||
+      isNaN(entry.altura)
+    ) {
+      throw new BadRequestException('Datos de cálculo inválidos');
+    }
+
     const calculo = this.calculoRepository.create({ ...entry, historial });
     return this.calculoRepository.save(calculo);
   }

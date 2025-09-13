@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ImcModule } from './imc.module';
+import { AppModule } from '../../app.module';
 
-describe('ImcModule', () => {
+describe('AppModule', () => {
   let module: TestingModule;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [ImcModule],
+      imports: [AppModule],
     }).compile();
   });
 

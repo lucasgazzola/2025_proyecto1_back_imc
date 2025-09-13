@@ -29,9 +29,15 @@ export class AuthService {
   async register(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
     if (user) {
-      throw new UnauthorizedException('El usuario ya existe');
+      // Usar ConflictException para usuario existente
+      const { ConflictException } = await import('@nestjs/common');
+      throw new ConflictException('El usuario ya existe');
     }
-    await this.userService.create(email, password);
-    return { message: 'Usuario registrado correctamente' };
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await this.userService.create(email, hashedPassword);
+    const payload = { sub: newUser.id, email: newUser.email };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }

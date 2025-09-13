@@ -31,10 +31,7 @@ export class AuthService {
     if (user) {
       throw new UnauthorizedException('El usuario ya existe');
     }
-    const newUser = await this.userService.create(email, password);
-    const payload = { sub: newUser.id, email: newUser.email };
-    return {
-      access_token: this.jwtService.sign(payload),
-    };
+    await this.userService.create(email, password);
+    return { message: 'Usuario registrado correctamente' };
   }
 }

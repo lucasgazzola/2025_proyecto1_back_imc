@@ -20,7 +20,7 @@ import { Module } from '@nestjs/common';
       database: process.env.DB_NAME,
       ssl: process.env.DB_SSL ? JSON.parse(process.env.DB_SSL) : undefined,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: process.env.NODE_ENV === 'development',
     }),
     ImcModule,
     UserModule,

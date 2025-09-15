@@ -48,7 +48,7 @@ describe('ImcController', () => {
     const req = { user: { email: 'test@example.com' } };
     const res = await controller.calcular(dto, req as any);
     expect(service.calcularImc).toHaveBeenCalledWith(dto);
-    expect(addHistoryMock).toHaveBeenCalledWith('test@example.com', {
+    expect(addHistoryMock).toHaveBeenCalledWith(req.user.email, {
       peso: dto.peso,
       altura: dto.altura,
       imc: resultado.imc,

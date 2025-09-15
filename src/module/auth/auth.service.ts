@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
+
 import { UserService } from '../user/user.service';
 import { JwtService } from './jwt.service';
 import * as bcrypt from 'bcrypt';
@@ -12,7 +17,12 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (!user) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
       return user;
     }
     throw new UnauthorizedException('Credenciales inválidas');
@@ -30,11 +40,9 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
     if (user) {
       // Usar ConflictException para usuario existente
-      const { ConflictException } = await import('@nestjs/common');
       throw new ConflictException('El usuario ya existe');
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await this.userService.create(email, hashedPassword);
+    const newUser = await this.userService.create(email, password);
     const payload = { sub: newUser.id, email: newUser.email };
     return {
       access_token: this.jwtService.sign(payload),

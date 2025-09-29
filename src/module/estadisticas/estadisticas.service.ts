@@ -43,9 +43,11 @@ export class EstadisticasService {
 
     // Calcular promedio/mediana de IMC
     const imcs = calculos.map((c) => c.imc);
-    const promedioImc = imcs.length
-      ? Math.round(strategy.calcular(imcs) * 100) / 100
-      : null;
+    let promedioImc: number | null = null;
+    if (imcs.length) {
+      const calculado = strategy.calcular(imcs);
+      promedioImc = isNaN(calculado) ? null : Math.round(calculado * 100) / 100;
+    }
 
     // Variación de peso (último - primero)
     let variacionPeso: number | null = null;

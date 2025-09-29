@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { UserModule } from './module/user/user.module';
 import { AuthModule } from './module/auth/auth.module';
 import { HistorialModule } from './module/historial/historial.module';
+import { EstadisticasModule } from './module/estadisticas/estadisticas.module';
 import { Module } from '@nestjs/common';
 
 @Module({
@@ -26,6 +27,7 @@ import { Module } from '@nestjs/common';
     UserModule,
     AuthModule,
     HistorialModule,
+    EstadisticasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

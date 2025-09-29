@@ -60,6 +60,11 @@ export class HistorialService {
 
   async getCalculos(historialId: number): Promise<Calculo[]> {
     const historial = await this.getById(historialId);
-    return historial?.calculos ?? [];
+    if (!historial?.calculos) return [];
+    // Mapear resultado -> categoria
+    return historial.calculos.map((c) => ({
+      ...c,
+      categoria: c.resultado,
+    }));
   }
 }

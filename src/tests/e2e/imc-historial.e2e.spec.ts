@@ -53,7 +53,7 @@ describe('IMC & Historial (e2e)', () => {
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThanOrEqual(2);
     expect(res.body[0].imc).toBeDefined();
-    expect(res.body[0].resultado).toBeDefined();
+    expect(res.body[0].categoria).toBeDefined();
   });
 
   it('no permite acceder al historial sin token', async () => {

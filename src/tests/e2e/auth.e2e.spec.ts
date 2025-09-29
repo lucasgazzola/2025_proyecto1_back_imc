@@ -15,7 +15,7 @@ describe('AuthController (e2e)', () => {
     await app.init();
   });
 
-  it('registers a new user', async () => {
+  it('registra exitoso', async () => {
     const uniqueEmail = `test${Date.now()}@correo.com`;
     const res = await request(app.getHttpServer())
       .post('/auth/register')
@@ -24,7 +24,7 @@ describe('AuthController (e2e)', () => {
     expect(res.body.access_token).toBeDefined();
   });
 
-  it('does not allow duplicate registration', async () => {
+  it('no permite registros duplicados', async () => {
     const email = 'test2@correo.com';
     await request(app.getHttpServer())
       .post('/auth/register')
@@ -35,7 +35,7 @@ describe('AuthController (e2e)', () => {
     expect(res.status).toBe(409);
   });
 
-  it('logs in a user', async () => {
+  it('login exitoso', async () => {
     await request(app.getHttpServer())
       .post('/auth/register')
       .send({ email: 'test3@correo.com', password: '123456' });
@@ -46,7 +46,7 @@ describe('AuthController (e2e)', () => {
     expect(res.body.access_token).toBeDefined();
   });
 
-  it('rejects login with wrong password', async () => {
+  it('login fallido con contraseña incorrecta', async () => {
     await request(app.getHttpServer())
       .post('/auth/register')
       .send({ email: 'test4@correo.com', password: '123456' });
